@@ -29,7 +29,7 @@ class Document: NSDocument {
 
     override func makeWindowControllers() {
         // Returns the Storyboard that contains your Document window.
-        let storyboard = NSStoryboard(name: "Main", bundle: nil)!
+        let storyboard = NSStoryboard(name: "Main", bundle: nil)
         windowController = storyboard.instantiateControllerWithIdentifier("Editor Window Controller") as! NSWindowController
         if let v = windowController.contentViewController as? EditorViewController{
             vc = v
@@ -39,7 +39,8 @@ class Document: NSDocument {
     
     }
 
-    override func dataOfType(typeName: String, error outError: NSErrorPointer) -> NSData? {
+    override func dataOfType(typeName: String) throws -> NSData {
+        var outError: NSError! = NSError(domain: "Migrator", code: 0, userInfo: nil)
     
         var arrayOfDictionaries = [NSDictionary]()
         
@@ -48,23 +49,35 @@ class Document: NSDocument {
             arrayOfDictionaries.append(entity.toDictionary())
         }
         
-        let data = NSJSONSerialization.dataWithJSONObject(arrayOfDictionaries, options: .allZeros, error: outError)
-        
-        return data
-    }
-
-    override func readFromData(data: NSData, ofType typeName: String, error outError: NSErrorPointer) -> Bool {
-       
-        if let arrayOfDictionaries = NSJSONSerialization.JSONObjectWithData(data, options: .allZeros, error: outError) as? [NSDictionary]{
-            
-            for dictionary in arrayOfDictionaries{
-                entities.append(EntityDescriptor(dictionary: dictionary))
-            }
-            
-            return true
+        let data: NSData?
+        do {
+            data = try NSJSONSerialization.dataWithJSONObject(arrayOfDictionaries, options: [])
+        } catch let error as NSError {
+            outError = error
+            data = nil
         }
         
-        return false
+        if let value = data {
+            return value
+        }
+        throw outError
+    }
+
+    override func readFromData(data: NSData, ofType typeName: String) throws {
+        let outError: NSError! = NSError(domain: "Migrator", code: 0, userInfo: nil)
+        
+        do {
+            if let arrayOfDictionaries = try NSJSONSerialization.JSONObjectWithData(data, options: []) as? [NSDictionary] {
+                for dictionary in arrayOfDictionaries{
+                    entities.append(EntityDescriptor(dictionary: dictionary))
+                }
+            }
+            
+            return
+        } catch {
+            throw outError
+        }
+       
     }
     
     

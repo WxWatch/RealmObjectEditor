@@ -22,7 +22,7 @@ class FileContentGenerator {
     }
     
     
-    func getFielContent() -> String
+    func getFieldContent() -> String
     {
         appendCopyrights(entity.name, fileExtension: lang.fileExtension)
         appendStaticImports()
@@ -30,7 +30,7 @@ class FileContentGenerator {
         content += lang.modelDefinition
         content += lang.modelStart
         content.replace(EntityName, by: entity.name)
-        if count(entity.superClassName) == 0{
+        if entity.superClassName.characters.count == 0{
             content.replace(ParentName, by: lang.defaultSuperClass)
         }else{
             content.replace(ParentName, by: entity.superClassName)
@@ -100,7 +100,7 @@ class FileContentGenerator {
             }
         }
         
-        if count(ignoredAttrs) > 0{
+        if ignoredAttrs.characters.count > 0{
             var ignoredAttrDef = ignoredPropertiesDef
             ignoredAttrDef.replace(IgnoredAttributes, by: ignoredAttrs)
             content += ignoredAttrDef
@@ -136,7 +136,7 @@ class FileContentGenerator {
             }
         }
         
-        if count(indexedAttrs) > 0{
+        if indexedAttrs.characters.count > 0{
             var indexedAttrDef = indexAttributesDefination
             indexedAttrDef.replace(IndexedAttributes, by: indexedAttrs)
             content += indexedAttrDef
@@ -168,10 +168,10 @@ class FileContentGenerator {
         for attr in entity.attributes{
             
             var attrDefination = ""
-            if lang.attributeDefinationWithDefaultValue != nil && count(lang.attributeDefinationWithDefaultValue) > 0 && attr.hasDefault{
+            if lang.attributeDefinationWithDefaultValue != nil && lang.attributeDefinationWithDefaultValue.characters.count > 0 && attr.hasDefault{
                 attrDefination = lang.attributeDefinationWithDefaultValue
                 
-                var defValue = defaultValueForAttribute(attr, types: types)
+                let defValue = defaultValueForAttribute(attr, types: types)
                 
                 attrDefination.replace(AttrDefaultValue, by: defValue)
                 
@@ -273,7 +273,7 @@ class FileContentGenerator {
     */
     func getYear() -> String
     {
-        return "\(NSCalendar.currentCalendar().component(.CalendarUnitYear, fromDate: NSDate()))"
+        return "\(NSCalendar.currentCalendar().component(.Year, fromDate: NSDate()))"
     }
     
     /**
@@ -281,7 +281,7 @@ class FileContentGenerator {
     */
     func getTodayFormattedDay() -> String
     {
-        let components = NSCalendar.currentCalendar().components(.CalendarUnitDay | .CalendarUnitMonth | .CalendarUnitYear, fromDate: NSDate())
+        let components = NSCalendar.currentCalendar().components([.Day, .Month, .Year], fromDate: NSDate())
         return "\(components.day)/\(components.month)/\(components.year)"
     }
 }

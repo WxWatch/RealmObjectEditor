@@ -153,7 +153,7 @@ class EditorViewController: NSViewController, NSTableViewDelegate, NSTableViewDa
         if entity == nil{
             return
         }
-        if count(newName) == 0{
+        if newName.characters.count == 0{
             entityNameField.stringValue = entity.name
             showErrorMessage(NSLocalizedString("EMPTY_ENTITY_NAME", tableName: "ErrorMessages", value:"Entity name cannot be empty", comment: "Displayed when trying to remove entity name"))
             
@@ -470,7 +470,7 @@ class EditorViewController: NSViewController, NSTableViewDelegate, NSTableViewDa
             return
         }
 
-        if count(newName) == 0{
+        if newName.characters.count == 0{
             showErrorMessage(NSLocalizedString("EMPTY_ATTR_NAME", tableName: "ErrorMessages", value:"Attribute name can not be empty", comment:"Displayed when user tries to remove an attribute name"))
             
             return
@@ -498,7 +498,7 @@ class EditorViewController: NSViewController, NSTableViewDelegate, NSTableViewDa
         var entityName = "Entity"
         if entities.count > 0{
             for i in 0 ..< entities.count{
-                var tmpName = "\(entityName)\(i+1)"
+                let tmpName = "\(entityName)\(i+1)"
                 
                 if !entityNameAlreadyUsed(tmpName){
                     entityName = tmpName
@@ -545,7 +545,7 @@ class EditorViewController: NSViewController, NSTableViewDelegate, NSTableViewDa
         var attrName = "attribute"
         if selectedEntity.attributes.count > 0{
             for i in 0 ..< selectedEntity.attributes.count{
-                var tmpName = "\(attrName)\(i+1)"
+                let tmpName = "\(attrName)\(i+1)"
                 
                 if !attributeNameAlreadyUsed(tmpName){
                     attrName = tmpName
@@ -584,7 +584,7 @@ class EditorViewController: NSViewController, NSTableViewDelegate, NSTableViewDa
         var relationshipName = "relationship"
         if selectedEntity.relationships.count > 0{
             for i in 0 ..< selectedEntity.relationships.count{
-                var tmpName = "\(relationshipName)\(i+1)"
+                let tmpName = "\(relationshipName)\(i+1)"
                 
                 if !relationshipNameAlreadyUsed(tmpName){
                     relationshipName = tmpName
@@ -857,7 +857,7 @@ class EditorViewController: NSViewController, NSTableViewDelegate, NSTableViewDa
         //        let fileName = "\(langName).json"
         let filePathUrl = NSBundle.mainBundle().URLForResource(langName, withExtension: "json")!
         let data = NSData(contentsOfURL: filePathUrl)
-        let jsonObject = NSJSONSerialization.JSONObjectWithData(data!, options: .allZeros, error: nil)! as! NSDictionary
+        let jsonObject = (try! NSJSONSerialization.JSONObjectWithData(data!, options: [])) as! NSDictionary
         let lang = LangModel(fromDictionary: jsonObject)
         return lang
     }
@@ -887,19 +887,21 @@ class EditorViewController: NSViewController, NSTableViewDelegate, NSTableViewDa
     /**
     Saves all the generated files in the specified path
     
-    :param: path in which to save the files
+    - parameter path: in which to save the files
     */
     func saveFiles(files:[FileModel], toPath path: String)
     {
-        let fileManager = NSFileManager.defaultManager()
         var error : NSError?
         
         for file in files{
-            let fileContent = file.fileContent
             
             let filePath = "\(path)/\(file.fileName).\(file.fileExtension)"
             
-            file.fileContent.writeToFile(filePath, atomically: false, encoding: NSUTF8StringEncoding, error: &error)
+            do {
+                try file.fileContent.writeToFile(filePath, atomically: false, encoding: NSUTF8StringEncoding)
+            } catch let error1 as NSError {
+                error = error1
+            }
             if error != nil{
                 showError(error!)
                 break

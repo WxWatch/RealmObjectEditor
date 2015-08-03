@@ -31,14 +31,14 @@ class EntityFilesGenerator {
             let file = FileModel()
             file.fileName = entity.name
             file.fileExtension = lang.fileExtension
-            file.fileContent = FileContentGenerator(entity: entity, lang: lang).getFielContent()
+            file.fileContent = FileContentGenerator(entity: entity, lang: lang).getFieldContent()
             files.append(file)
             if lang.implementation != nil{
                 //This language also provides a seperate implementation file
                 let implementationFile = FileModel()
                 implementationFile.fileName = entity.name
                 implementationFile.fileExtension = lang.implementation.fileExtension
-                implementationFile.fileContent = ImplementationFileContentGenerator(entity: entity, lang: lang).getFielContent()
+                implementationFile.fileContent = ImplementationFileContentGenerator(entity: entity, lang: lang).getFieldContent()
                 files.append(implementationFile)
             }
         }
@@ -48,9 +48,9 @@ class EntityFilesGenerator {
     
     func fileContentForEntity(entity: EntityDescriptor, lang: LangModel) -> String
     {
-        var contentGenerator = FileContentGenerator(entity: entity, lang: lang)
+        let contentGenerator = FileContentGenerator(entity: entity, lang: lang)
         
-        return FileContentGenerator(entity: entity, lang: lang).getFielContent()
+        return contentGenerator.getFieldContent()
     }
     
     func headerFileContentForEntity(entity: EntityDescriptor, lang: LangModel) -> String

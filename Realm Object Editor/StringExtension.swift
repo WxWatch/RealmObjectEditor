@@ -40,12 +40,12 @@ extension String{
     func toSingular() -> String
     {
         var singular = self
-        let length = count(self)
+        let length = self.characters.count
         if length > 3{
             let range = Range(start: advance(endIndex, -3), end: endIndex)
             let lastThreeChars = self.substringWithRange(range)
             if lastThreeChars == "ies" {
-                singular = self.stringByReplacingOccurrencesOfString(lastThreeChars, withString: "y", options: .allZeros, range: range)
+                singular = self.stringByReplacingOccurrencesOfString(lastThreeChars, withString: "y", options: [], range: range)
             }
             
         }
@@ -53,7 +53,7 @@ extension String{
             let range = Range(start: advance(endIndex, -1), end: endIndex)
             let lastChar = self.substringWithRange(range)
             if lastChar == "s" {
-                singular = self.stringByReplacingOccurrencesOfString(lastChar, withString: "", options: .allZeros, range: range)
+                singular = self.stringByReplacingOccurrencesOfString(lastChar, withString: "", options: [], range: range)
             }
         }
         return singular
@@ -62,7 +62,7 @@ extension String{
     /**
     Converts the first character to its lower case version
     
-    :returns: the converted version
+    - returns: the converted version
     */
     func lowercaseFirstChar() -> String{
         let range = Range(start: startIndex, end: advance(startIndex, 1))
@@ -74,7 +74,7 @@ extension String{
     /**
     Converts the first character to its upper case version
     
-    :returns: the converted version
+    - returns: the converted version
     */
     func uppercaseFirstChar() -> String{
         let range = Range(start: startIndex, end: advance(startIndex, 1))
